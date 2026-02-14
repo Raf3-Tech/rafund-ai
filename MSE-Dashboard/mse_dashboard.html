@@ -439,6 +439,108 @@
             margin-bottom: 1rem;
         }
 
+        /* Date range control */
+        .date-range-control {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .date-range-control input,
+        .date-range-control select,
+        .date-range-control button {
+            padding: 0.75rem;
+            background: #1a1a1a;
+            border: 1px solid #404040;
+            border-radius: 0.5rem;
+            color: #ffffff;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .date-range-control input:focus,
+        .date-range-control select:focus {
+            outline: none;
+            border-color: #808080;
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+        }
+
+        .date-range-control button {
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .date-range-control button:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        /* Stat box */
+        .stat-box {
+            background: linear-gradient(145deg, #252525 0%, rgba(26, 31, 46, 0.8) 100%);
+            border: 1px solid #404040;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .stat-box .label {
+            font-size: 0.875rem;
+            color: #b0b0b0;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-box .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Historical table */
+        .historical-table {
+            width: 100%;
+        }
+
+        .historical-table thead {
+            background: #1a1a1a;
+        }
+
+        .historical-table thead tr {
+            border-bottom: 1px solid #404040;
+        }
+
+        .historical-table th {
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .historical-table tbody tr {
+            border-bottom: 1px solid rgba(64, 64, 64, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .historical-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .historical-table td {
+            padding: 1rem;
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .movers-grid {
@@ -487,6 +589,7 @@
                 <button class="tab-btn active mono" data-tab="market">📊 Market</button>
                 <button class="tab-btn mono" data-tab="portfolio">💼 Portfolio</button>
                 <button class="tab-btn mono" data-tab="watchlist">⭐ Watchlist</button>
+                <button class="tab-btn mono" data-tab="historical">📈 Historical Analysis</button>
             </div>
         </header>
 
@@ -753,6 +856,124 @@
             </div>
         </div>
 
+        <!-- ======================== HISTORICAL TAB ======================== -->
+        <div id="historical-tab" class="tab-content">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mono text-white mb-4">Historical Data Analysis</h2>
+                
+                <!-- Date Range Controls -->
+                <div class="date-range-control">
+                    <div style="flex: 1; min-width: 150px;">
+                        <label class="text-sm text-gray-400 block mb-2">Start Date</label>
+                        <input type="date" id="startDate" class="w-full">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label class="text-sm text-gray-400 block mb-2">End Date</label>
+                        <input type="date" id="endDate" class="w-full">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label class="text-sm text-gray-400 block mb-2">Stock Symbol</label>
+                        <select id="historicalSymbolSelect" class="w-full"></select>
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label class="text-sm text-gray-400 block mb-2">Quick Range</label>
+                        <select id="quickRangeSelect" class="w-full">
+                            <option value="7">Last 7 Days</option>
+                            <option value="30">Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <button id="loadHistoricalBtn" style="align-self: flex-end;" class="mb-2">📊 Load Data</button>
+                </div>
+
+                <!-- Historical Statistics -->
+                <div id="historicalStats" class="summary-grid mb-8">
+                    <div class="stat-box">
+                        <div class="label">Period High</div>
+                        <div id="periodHigh" class="value">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Period Low</div>
+                        <div id="periodLow" class="value">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Average Price</div>
+                        <div id="periodAvg" class="value">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Volatility (%)</div>
+                        <div id="periodVolatility" class="value">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Period Change</div>
+                        <div id="periodChange" class="value">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Avg Daily Volume</div>
+                        <div id="periodAvgVolume" class="value">--</div>
+                    </div>
+                </div>
+
+                <!-- Price Trend Chart -->
+                <div class="card rounded-xl p-6 mb-8">
+                    <h3 class="text-lg font-bold mb-4 text-white mono">Price Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Volume Trend Chart -->
+                <div class="card rounded-xl p-6 mb-8">
+                    <h3 class="text-lg font-bold mb-4 text-white mono">Volume Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="volumeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Comparison Chart -->
+                <div class="card rounded-xl p-6 mb-8">
+                    <h3 class="text-lg font-bold mb-4 text-white mono">Multi-Stock Comparison</h3>
+                    <div class="flex gap-4 mb-4">
+                        <select id="compareSymbolSelect1" class="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white"></select>
+                        <select id="compareSymbolSelect2" class="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white"></select>
+                        <select id="compareSymbolSelect3" class="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white"></select>
+                        <button id="loadComparisonBtn" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded transition">Compare</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Historical Data Table -->
+                <div class="card rounded-xl overflow-hidden">
+                    <div class="p-6 border-b border-gray-700">
+                        <h3 class="text-lg font-bold text-white mono">Historical Data</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="historical-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Symbol</th>
+                                    <th>Open Price</th>
+                                    <th>Close Price</th>
+                                    <th>Change %</th>
+                                    <th>Volume</th>
+                                    <th>Turnover</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historicalTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center py-8 text-gray-500">No data loaded. Use the date controls above to load historical data.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Footer -->
         <footer class="mt-8 text-center text-gray-500 text-sm mono slide-in" style="animation-delay: 0.4s;">
             <p>Powered by Rafund • MSE Mainboard Analytics & Portfolio Dashboard</p>
@@ -894,7 +1115,7 @@
             if (stocks.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                        <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                             No stocks found.
                         </td>
                     </tr>
@@ -1006,6 +1227,86 @@
 
         // Auto-refresh every 30 seconds
         setInterval(fetchStocks, 30000);
+
+        // ============================================
+        // HISTORICAL DATA FUNCTIONS
+        // ============================================
+        let historicalData = {};
+
+        function initHistoricalSelects() {
+            const symbols = allStocks.map(s => s[COLUMNS.symbol]);
+            const historicalSelect = document.getElementById('historicalSymbolSelect');
+            const compareSelects = [document.getElementById('compareSymbolSelect1'), 
+                                   document.getElementById('compareSymbolSelect2'),
+                                   document.getElementById('compareSymbolSelect3')];
+            
+            if (historicalSelect) {
+                historicalSelect.innerHTML = '<option value="">Select Stock...</option>' + 
+                    symbols.map(s => `<option value="${s}">${s}</option>`).join('');
+            }
+            
+            compareSelects.forEach(select => {
+                if (select) {
+                    select.innerHTML = '<option value="">Select Stock...</option>' + 
+                        symbols.map(s => `<option value="${s}">${s}</option>`).join('');
+                }
+            });
+        }
+
+        function loadHistoricalData() {
+            const symbol = document.getElementById('historicalSymbolSelect').value;
+            const startDateInput = document.getElementById('startDate').value;
+            const endDateInput = document.getElementById('endDate').value;
+            
+            if (!symbol) {
+                alert('Please select a stock');
+                return;
+            }
+
+            // For now, we'll show a message since we don't have actual historical data
+            // In a real implementation, this would fetch from a data source
+            alert('Historical data loading: ' + symbol + '\nNote: Historical data functionality requires an API connection.');
+        }
+
+        function loadComparisonData() {
+            const symbol1 = document.getElementById('compareSymbolSelect1').value;
+            const symbol2 = document.getElementById('compareSymbolSelect2').value;
+            const symbol3 = document.getElementById('compareSymbolSelect3').value;
+            
+            const symbols = [symbol1, symbol2, symbol3].filter(s => s);
+            if (symbols.length === 0) {
+                alert('Please select at least one stock to compare');
+                return;
+            }
+
+            alert('Comparison loading for: ' + symbols.join(', ') + '\nNote: Historical data functionality requires an API connection.');
+        }
+
+        // Event listeners for historical tab
+        const loadHistoricalBtn = document.getElementById('loadHistoricalBtn');
+        if (loadHistoricalBtn) {
+            loadHistoricalBtn.addEventListener('click', loadHistoricalData);
+        }
+
+        const loadComparisonBtn = document.getElementById('loadComparisonBtn');
+        if (loadComparisonBtn) {
+            loadComparisonBtn.addEventListener('click', loadComparisonData);
+        }
+
+        // Quick range selector
+        const quickRangeSelect = document.getElementById('quickRangeSelect');
+        if (quickRangeSelect) {
+            quickRangeSelect.addEventListener('change', (e) => {
+                if (e.target.value !== 'custom') {
+                    const days = parseInt(e.target.value);
+                    const endDate = new Date();
+                    const startDate = new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000);
+                    
+                    document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+                    document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+                }
+            });
+        }
 
         // ============================================
         // PORTFOLIO & WATCHLIST FUNCTIONS
@@ -1549,10 +1850,19 @@
             }
         });
 
+        // Event listener for add watchlist button
+        const addWatchlistBtn = document.getElementById('addWatchlistBtn');
+        if (addWatchlistBtn) {
+            addWatchlistBtn.addEventListener('click', () => {
+                document.getElementById('watchlistSymbolSelect').focus();
+            });
+        }
+
         // Initial load
         fetchStocks();
         renderPortfolioList();
         renderWatchlist();
+        initHistoricalSelects();
     </script>
 </body>
 </html>

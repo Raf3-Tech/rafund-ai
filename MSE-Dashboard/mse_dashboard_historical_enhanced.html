@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSE Mainboard - Enhanced Dashboard with Historical Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Crimson+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #252525;
+            --accent-green: #000000;
+            --accent-red: #000000;
+            --accent-blue: #000000;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+        }
+
+        body {
+            font-family: 'Crimson Pro', serif;
+            background: #000000;
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .glow-green {
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+        }
+
+        .glow-red {
+            color: #ff4757;
+            text-shadow: 0 0 20px rgba(255, 71, 87, 0.8);
+        }
+
+        .card {
+            background: linear-gradient(145deg, var(--bg-card) 0%, rgba(26, 31, 46, 0.8) 100%);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Tab Navigation */
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #808080;
+        }
+
+        .tab-btn.active {
+            color: #ffffff;
+            border-bottom-color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container-small {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Date Controls */
+        .date-range-control {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #404040;
+            margin-bottom: 2rem;
+        }
+
+        .date-range-control input[type="date"],
+        .date-range-control select {
+            padding: 0.5rem;
+            background: #1a1a1a;
+            border: 1px solid #404040;
+            color: #ffffff;
+            border-radius: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .date-range-control button {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .date-range-control button:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        /* Historical Data Table */
+        .historical-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .historical-table thead {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 2px solid #404040;
+        }
+
+        .historical-table th {
+            padding: 0.75rem;
+            text-align: left;
+            color: #b0b0b0;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .historical-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #404040;
+        }
+
+        .historical-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Time Series Legend */
+        .legend-item {
+            display: inline-block;
+            margin-right: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .legend-color {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        /* Statistics Box */
+        .stat-box {
+            padding: 1rem;
+            background: linear-gradient(145deg, #252525 0%, rgba(26, 31, 46, 0.8) 100%);
+            border: 1px solid #404040;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .stat-box .label {
+            font-size: 0.875rem;
+            color: #b0b0b0;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-box .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #808080;
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 255, 136, 0.1);
+            border-top-color: #00ff88;
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #808080;
+        }
+
+        /* Summary Grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h1 class="text-5xl font-bold mb-2 mono tracking-tight">
+                        <span class="text-white">MSE</span>
+                        <span class="text-gray-300">MAINBOARD</span>
+                    </h1>
+                    <p class="text-lg text-gray-400 flex items-center gap-2">
+                        📊 Enhanced Analytics Dashboard with Historical Data
+                    </p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm text-gray-500 mono">Last Updated</p>
+                    <p id="lastUpdate" class="text-lg font-semibold mono text-gray-300">--:--:--</p>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex gap-8 border-b border-gray-700 mt-6 overflow-x-auto">
+                <button class="tab-btn active mono" data-tab="market">📊 Current Market</button>
+                <button class="tab-btn mono" data-tab="historical">📈 Historical Analysis</button>
+                <button class="tab-btn mono" data-tab="portfolio">💼 Portfolio</button>
+                <button class="tab-btn mono" data-tab="watchlist">⭐ Watchlist</button>
+            </div>
+        </header>
+
+        <!-- ======================== HISTORICAL TAB ======================== -->
+        <div id="historical-tab" class="tab-content">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mono text-white mb-4">Historical Data Analysis</h2>
+                
+                <!-- Date Range Controls -->
+                <div class="date-range-control">
+                    <div style="flex: 1; min-width: 150px;">
+                        <label class="text-sm text-gray-400 block mb-2">Start Date</label>
+                        <input type="date" id="startDate" class="w-full">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label class="text-sm text-gray-400 block mb-2">End Date</label>
+                        <input type="date" id="endDate" class="w-full">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label class="text-sm text-gray-400 block mb-2">Stock Symbol</label>
+                        <select id="historicalSymbolSelect" class="w-full"></select>
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label class="text-sm text-gray-400 block mb-2">Quick Range</label>
+                        <select id="quickRangeSelect" class="w-full">
+                            <option value="7">Last 7 Days</option>
+                            <option value="30">Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <button id="loadHistoricalBtn" style="align-self: flex-end;" class="mb-2">📊 Load Data</button>
+                </div>
+
+                <!-- Historical Statistics -->
+                <div id="historicalStats" class="summary-grid mb-8">
+                    <div class="stat-box">
+                        <div class="label">Period High</div>
+                        <div id="periodHigh" class="value">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Period Low</div>
+                        <div id="periodLow" class="value">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Average Price</div>
+                        <div id="periodAvg" class="value">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Volatility (%)</div>
+                        <div id="periodVolatility" class="value">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Period Change</div>
+                        <div id="periodChange" class="value">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">Avg Daily Volume</div>
+                        <div id="periodAvgVolume" class="value">--</div>
+                    </div>
+                </div>
+
+                <!-- Price Trend Chart -->
+                <div class="card rounded-xl p-6 mb-8">
+                    <h3 class="text-lg font-bold mb-4 text-white mono">Price Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="priceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Volume Trend Chart -->
+                <div class="card rounded-xl p-6 mb-8">
+                    <h3 class="text-lg font-bold mb-4 text-white mono">Volume Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="volumeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Comparison Chart -->
+                <div class="card rounded-xl p-6 mb-8">
+                    <h3 class="text-lg font-bold mb-4 text-white mono">Multi-Stock Comparison</h3>
+                    <div class="flex gap-4 mb-4">
+                        <select id="compareSymbolSelect1" class="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white"></select>
+                        <select id="compareSymbolSelect2" class="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white"></select>
+                        <select id="compareSymbolSelect3" class="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded text-white"></select>
+                        <button id="loadComparisonBtn" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded transition">Compare</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Historical Data Table -->
+                <div class="card rounded-xl overflow-hidden">
+                    <div class="p-6 border-b border-gray-700">
+                        <h3 class="text-lg font-bold text-white mono">Historical Data</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="historical-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Symbol</th>
+                                    <th>Open Price</th>
+                                    <th>Close Price</th>
+                                    <th>Change %</th>
+                                    <th>Volume</th>
+                                    <th>Turnover</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historicalTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center py-8 text-gray-500">No data loaded. Use the date controls above to load historical data.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================== OTHER TABS PLACEHOLDER ======================== -->
+        <div id="market-tab" class="tab-content">
+            <div class="empty-state">
+                <p>Market tab content would go here...</p>
+                <p class="text-sm text-gray-600 mt-2">Load <code>mse_dashboard.html</code> for current market view</p>
+            </div>
+        </div>
+
+        <div id="portfolio-tab" class="tab-content">
+            <div class="empty-state">
+                <p>Portfolio tab content would go here...</p>
+            </div>
+        </div>
+
+        <div id="watchlist-tab" class="tab-content">
+            <div class="empty-state">
+                <p>Watchlist tab content would go here...</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-500 text-sm mono">
+            <p>Powered by Rafund • Enhanced MSE Mainboard Analytics Dashboard with Historical Analysis</p>
+        </footer>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION & DATA LOADING
+        // ============================================
+        const HISTORICAL_DATA_FILE = '../mse_data/mse_historical_data.json';
+        let historicalData = {};
+        let currentPriceData = [];
+        let allSymbols = [];
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+        function formatCurrency(value) {
+            if (!value) return '--';
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'MWK',
+                minimumFractionDigits: 2
+            }).format(value);
+        }
+
+        function formatNumber(value) {
+            if (!value) return '--';
+            if (value >= 1e9) return (value / 1e9).toFixed(2) + 'B';
+            if (value >= 1e6) return (value / 1e6).toFixed(2) + 'M';
+            if (value >= 1e3) return (value / 1e3).toFixed(2) + 'K';
+            return value.toLocaleString();
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = now.toLocaleTimeString();
+        }
+
+        // ============================================
+        // HISTORICAL DATA FUNCTIONS
+        // ============================================
+        async function loadHistoricalData() {
+            try {
+                const response = await fetch(HISTORICAL_DATA_FILE);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                historicalData = await response.json();
+                
+                // Extract unique symbols
+                const symbolSet = new Set();
+                Object.values(historicalData).forEach(dayData => {
+                    if (Array.isArray(dayData)) {
+                        dayData.forEach(stock => {
+                            if (stock.symbol) symbolSet.add(stock.symbol);
+                        });
+                    }
+                });
+                
+                allSymbols = Array.from(symbolSet).sort();
+                
+                // Populate select dropdowns
+                populateSymbolSelects();
+                
+                // Set default date range to last 30 days
+                setDefaultDateRange();
+                
+                console.log(`✓ Loaded historical data for ${allSymbols.length} stocks`);
+                updateTimestamp();
+                
+            } catch (error) {
+                console.error('Error loading historical data:', error);
+                document.getElementById('historicalTableBody').innerHTML = `
+                    <tr>
+                        <td colspan="7" class="px-6 py-8 text-center text-red-400">
+                            Error loading historical data: ${error.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function populateSymbolSelects() {
+            const selects = [
+                'historicalSymbolSelect',
+                'compareSymbolSelect1',
+                'compareSymbolSelect2',
+                'compareSymbolSelect3'
+            ];
+            
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = '<option value="">Select Stock...</option>' +
+                        allSymbols.map(s => `<option value="${s}">${s}</option>`).join('');
+                    if (allSymbols.length > 0) select.value = allSymbols[0];
+                }
+            });
+        }
+
+        function setDefaultDateRange() {
+            const endDate = new Date();
+            const startDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('endDate').valueAsDate = endDate;
+            document.getElementById('startDate').valueAsDate = startDate;
+        }
+
+        function getStockData(symbol, startDate, endDate) {
+            const data = [];
+            
+            Object.entries(historicalData).forEach(([date, dayData]) => {
+                if (date >= startDate && date <= endDate) {
+                    const stock = Array.isArray(dayData) 
+                        ? dayData.find(s => s.symbol === symbol)
+                        : null;
+                    
+                    if (stock) {
+                        data.push({
+                            date,
+                            ...stock
+                        });
+                    }
+                }
+            });
+            
+            return data.sort((a, b) => a.date.localeCompare(b.date));
+        }
+
+        function calculateStatistics(data) {
+            if (data.length === 0) {
+                return {
+                    high: 0, low: 0, avg: 0, volatility: 0,
+                    change: 0, avgVolume: 0
+                };
+            }
+            
+            const prices = data.map(d => parseFloat(d.close_price) || 0);
+            const volumes = data.map(d => parseFloat(d.volume) || 0);
+            
+            const high = Math.max(...prices);
+            const low = Math.min(...prices);
+            const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+            
+            // Calculate volatility (standard deviation)
+            const variance = prices.reduce((sum, price) => {
+                return sum + Math.pow(price - avg, 2);
+            }, 0) / prices.length;
+            const volatility = Math.sqrt(variance);
+            const volatilityPercent = (volatility / avg) * 100;
+            
+            // Calculate period change
+            const firstPrice = prices[0];
+            const lastPrice = prices[prices.length - 1];
+            const change = ((lastPrice - firstPrice) / firstPrice) * 100;
+            
+            // Average volume
+            const avgVolume = volumes.reduce((a, b) => a + b, 0) / volumes.length;
+            
+            return { high, low, avg, volatility: volatilityPercent, change, avgVolume };
+        }
+
+        function updateStatistics(data) {
+            const stats = calculateStatistics(data);
+            
+            document.getElementById('periodHigh').textContent = formatCurrency(stats.high);
+            document.getElementById('periodLow').textContent = formatCurrency(stats.low);
+            document.getElementById('periodAvg').textContent = formatCurrency(stats.avg);
+            document.getElementById('periodVolatility').textContent = stats.volatility.toFixed(2) + '%';
+            
+            const changeEl = document.getElementById('periodChange');
+            changeEl.textContent = (stats.change >= 0 ? '+' : '') + stats.change.toFixed(2) + '%';
+            changeEl.className = `value ${stats.change >= 0 ? 'glow-green' : 'glow-red'}`;
+            
+            document.getElementById('periodAvgVolume').textContent = formatNumber(stats.avgVolume);
+        }
+
+        function renderHistoricalTable(data) {
+            const tbody = document.getElementById('historicalTableBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">No data found for selected range</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = data.map(row => {
+                const changePercent = parseFloat(row.change_percent) || 0;
+                const changeClass = changePercent >= 0 ? 'glow-green' : 'glow-red';
+                const changeIcon = changePercent >= 0 ? '▲' : '▼';
+                
+                return `
+                    <tr class="hover:bg-gray-900/30">
+                        <td class="px-6 py-4 text-gray-400 mono font-mono">${row.date}</td>
+                        <td class="px-6 py-4 font-bold">${row.symbol}</td>
+                        <td class="px-6 py-4 text-right mono">${formatCurrency(row.open_price)}</td>
+                        <td class="px-6 py-4 text-right mono font-bold">${formatCurrency(row.close_price)}</td>
+                        <td class="px-6 py-4 text-right font-bold ${changeClass}">${changeIcon} ${Math.abs(changePercent).toFixed(2)}%</td>
+                        <td class="px-6 py-4 text-right mono text-gray-400">${formatNumber(row.volume)}</td>
+                        <td class="px-6 py-4 text-right mono text-gray-400">${formatCurrency(row.turnover)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // CHART FUNCTIONS
+        // ============================================
+        let priceChartInstance = null;
+        let volumeChartInstance = null;
+        let comparisonChartInstance = null;
+
+        function initPriceChart(symbol, data) {
+            const canvas = document.getElementById('priceChart');
+            if (!canvas) return;
+            
+            const dates = data.map(d => d.date);
+            const prices = data.map(d => parseFloat(d.close_price) || 0);
+            
+            if (priceChartInstance) priceChartInstance.destroy();
+            
+            priceChartInstance = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: `${symbol} Price`,
+                        data: prices,
+                        borderColor: '#00ff88',
+                        backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#00ff88'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#b0b0b0' } }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#808080' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#808080' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initVolumeChart(symbol, data) {
+            const canvas = document.getElementById('volumeChart');
+            if (!canvas) return;
+            
+            const dates = data.map(d => d.date);
+            const volumes = data.map(d => parseFloat(d.volume) || 0);
+            
+            if (volumeChartInstance) volumeChartInstance.destroy();
+            
+            volumeChartInstance = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Trading Volume',
+                        data: volumes,
+                        backgroundColor: 'rgba(100, 200, 255, 0.7)',
+                        borderColor: 'rgba(100, 200, 255, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#808080' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#808080' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initComparisonChart(symbols, startDate, endDate) {
+            const canvas = document.getElementById('comparisonChart');
+            if (!canvas) return;
+            
+            const symbolsToCompare = symbols.filter(s => s);
+            if (symbolsToCompare.length === 0) return;
+            
+            // Get all unique dates across all symbols
+            const allDates = new Set();
+            symbolsToCompare.forEach(symbol => {
+                const data = getStockData(symbol, startDate, endDate);
+                data.forEach(d => allDates.add(d.date));
+            });
+            
+            const dates = Array.from(allDates).sort();
+            
+            const colors = ['#00ff88', '#ff4757', '#64c8ff'];
+            const datasets = symbolsToCompare.map((symbol, idx) => {
+                const data = getStockData(symbol, startDate, endDate);
+                const prices = dates.map(date => {
+                    const row = data.find(d => d.date === date);
+                    return row ? parseFloat(row.close_price) : null;
+                });
+                
+                return {
+                    label: symbol,
+                    data: prices,
+                    borderColor: colors[idx],
+                    backgroundColor: colors[idx] + '15',
+                    tension: 0.4,
+                    fill: false,
+                    pointRadius: 2
+                };
+            });
+            
+            if (comparisonChartInstance) comparisonChartInstance.destroy();
+            
+            comparisonChartInstance = new Chart(canvas, {
+                type: 'line',
+                data: { labels: dates, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#b0b0b0' } }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#808080' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        },
+                        x: {
+                            ticks: { color: '#808080' },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // EVENT HANDLERS
+        // ============================================
+        document.getElementById('loadHistoricalBtn').addEventListener('click', () => {
+            const symbol = document.getElementById('historicalSymbolSelect').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!symbol || !startDate || !endDate) {
+                alert('Please select symbol and date range');
+                return;
+            }
+            
+            const data = getStockData(symbol, startDate, endDate);
+            updateStatistics(data);
+            renderHistoricalTable(data);
+            initPriceChart(symbol, data);
+            initVolumeChart(symbol, data);
+        });
+
+        document.getElementById('loadComparisonBtn').addEventListener('click', () => {
+            const symbols = [
+                document.getElementById('compareSymbolSelect1').value,
+                document.getElementById('compareSymbolSelect2').value,
+                document.getElementById('compareSymbolSelect3').value
+            ];
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            initComparisonChart(symbols, startDate, endDate);
+        });
+
+        document.getElementById('quickRangeSelect').addEventListener('change', (e) => {
+            if (e.target.value === 'custom') return;
+            
+            const days = parseInt(e.target.value);
+            const endDate = new Date();
+            const startDate = new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('startDate').valueAsDate = startDate;
+            document.getElementById('endDate').valueAsDate = endDate;
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tabName = e.target.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+                e.target.classList.add('active');
+            });
+        });
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            loadHistoricalData();
+        });
+    </script>
+</body>
+</html>

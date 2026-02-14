@@ -1,0 +1,252 @@
+{
+  "stocks": [
+    {
+      "symbol": "AIRTEL",
+      "open_price": 114.98,
+      "close_price": 114.98,
+      "change_percent": 0.0,
+      "volume": 0.0,
+      "turnover": 0.0,
+      "timestamp": "2026-02-10T11:33:11.919157"
+    },
+    {
+      "symbol": "BHL",
+      "open_price": 15.0,
+      "close_price": 15.0,
+      "change_percent": 0.0,
+      "volume": 32888.0,
+      "turnover": 493320.0,
+      "timestamp": "2026-02-10T11:33:11.919251"
+    },
+    {
+      "symbol": "FDHB",
+      "open_price": 595.11,
+      "close_price": 594.89,
+      "change_percent": 0.0,
+      "volume": 2322.0,
+      "turnover": 1381348.0,
+      "timestamp": "2026-02-10T11:33:11.919328"
+    },
+    {
+      "symbol": "FMBCH",
+      "open_price": 2850.0,
+      "close_price": 2850.0,
+      "change_percent": 0.0,
+      "volume": 0.0,
+      "turnover": 0.0,
+      "timestamp": "2026-02-10T11:33:11.919399"
+    },
+    {
+      "symbol": "ICON",
+      "open_price": 15.97,
+      "close_price": 15.97,
+      "change_percent": 0.0,
+      "volume": 0.0,
+      "turnover": 0.0,
+      "timestamp": "2026-02-10T11:33:11.919471"
+    },
+    {
+      "symbol": "ILLOVO",
+      "open_price": 2680.08,
+      "close_price": 2680.08,
+      "change_percent": 0.0,
+      "volume": 0.0,
+      "turnover": 0.0,
+      "timestamp": "2026-02-10T11:33:11.919540"
+    },
+    {
+      "symbol": "MPICO",
+      "open_price": 19.45,
+      "close_price": 19.45,
+      "change_percent": 0.0,
+      "volume": 0.0,
+      "turnover": 0.0,
+      "timestamp": "2026-02-10T11:33:11.919606"
+    },
+    {
+      "symbol": "NBM",
+      "open_price": 11719.8,
+      "close_price": 11719.7,
+      "change_percent": 0.0,
+      "volume": 84.0,
+      "turnover": 984454.8,
+      "timestamp": "2026-02-10T11:33:11.919672"
+    },
+    {
+      "symbol": "NBS",
+      "open_price": 891.44,
+      "close_price": 891.38,
+      "change_percent": 0.0,
+      "volume": 1193.0,
+      "turnover": 1063421.0,
+      "timestamp": "2026-02-10T11:33:11.919738"
+    },
+    {
+      "symbol": "NICO",
+      "open_price": 1714.58,
+      "close_price": 1712.99,
+      "change_percent": 0.0,
+      "volume": 51.0,
+      "turnover": 87362.49,
+      "timestamp": "2026-02-10T11:33:11.919805"
+    },
+    {
+      "symbol": "NITL",
+      "open_price": 3934.44,
+      "close_price": 3934.44,
+      "change_percent": 0.0,
+      "volume": 0.0,
+      "turnover": 0.0,
+      "timestamp": "2026-02-10T11:33:11.919872"
+    },
+    {
+      "symbol": "OMU",
+      "open_price": 3790.05,
+      "close_price": 3790.05,
+      "change_percent": 0.0,
+      "volume": 0.0,
+      "turnover": 0.0,
+      "timestamp": "2026-02-10T11:33:11.919937"
+    },
+    {
+      "symbol": "PCL",
+      "open_price": 7827.99,
+      "close_price": 7827.99,
+      "change_percent": 0.0,
+      "volume": 2.0,
+      "turnover": 15655.98,
+      "timestamp": "2026-02-10T11:33:11.920001"
+    },
+    {
+      "symbol": "STANDARD",
+      "open_price": 4238.95,
+      "close_price": 4238.95,
+      "change_percent": 0.0,
+      "volume": 0.0,
+      "turnover": 0.0,
+      "timestamp": "2026-02-10T11:33:11.920068"
+    },
+    {
+      "symbol": "SUNBIRD",
+      "open_price": 1700.02,
+      "close_price": 1700.02,
+      "change_percent": 0.0,
+      "volume": 0.0,
+      "turnover": 0.0,
+      "timestamp": "2026-02-10T11:33:11.920134"
+    },
+    {
+      "symbol": "TNM",
+      "open_price": 31.25,
+      "close_price": 31.25,
+      "change_percent": 0.0,
+      "volume": 205.0,
+      "turnover": 6406.25,
+      "timestamp": "2026-02-10T11:33:11.920202"
+    }
+  ],
+  "indices": [
+    {
+      "symbol": "AIRTEL",
+      "value": 114.98,
+      "change": 114.98,
+      "timestamp": "2026-02-10T11:33:12.354398"
+    },
+    {
+      "symbol": "BHL",
+      "value": 15.0,
+      "change": 15.0,
+      "timestamp": "2026-02-10T11:33:12.354433"
+    },
+    {
+      "symbol": "FDHB",
+      "value": 595.11,
+      "change": 594.89,
+      "timestamp": "2026-02-10T11:33:12.354457"
+    },
+    {
+      "symbol": "FMBCH",
+      "value": 2850.0,
+      "change": 2850.0,
+      "timestamp": "2026-02-10T11:33:12.354479"
+    },
+    {
+      "symbol": "ICON",
+      "value": 15.97,
+      "change": 15.97,
+      "timestamp": "2026-02-10T11:33:12.354501"
+    },
+    {
+      "symbol": "ILLOVO",
+      "value": 2680.08,
+      "change": 2680.08,
+      "timestamp": "2026-02-10T11:33:12.354522"
+    },
+    {
+      "symbol": "MPICO",
+      "value": 19.45,
+      "change": 19.45,
+      "timestamp": "2026-02-10T11:33:12.354544"
+    },
+    {
+      "symbol": "NBM",
+      "value": 11719.8,
+      "change": 11719.7,
+      "timestamp": "2026-02-10T11:33:12.354564"
+    },
+    {
+      "symbol": "NBS",
+      "value": 891.44,
+      "change": 891.38,
+      "timestamp": "2026-02-10T11:33:12.354585"
+    },
+    {
+      "symbol": "NICO",
+      "value": 1714.58,
+      "change": 1712.99,
+      "timestamp": "2026-02-10T11:33:12.354606"
+    },
+    {
+      "symbol": "NITL",
+      "value": 3934.44,
+      "change": 3934.44,
+      "timestamp": "2026-02-10T11:33:12.354627"
+    },
+    {
+      "symbol": "OMU",
+      "value": 3790.05,
+      "change": 3790.05,
+      "timestamp": "2026-02-10T11:33:12.354648"
+    },
+    {
+      "symbol": "PCL",
+      "value": 7827.99,
+      "change": 7827.99,
+      "timestamp": "2026-02-10T11:33:12.354670"
+    },
+    {
+      "symbol": "STANDARD",
+      "value": 4238.95,
+      "change": 4238.95,
+      "timestamp": "2026-02-10T11:33:12.354694"
+    },
+    {
+      "symbol": "SUNBIRD",
+      "value": 1700.02,
+      "change": 1700.02,
+      "timestamp": "2026-02-10T11:33:12.354715"
+    },
+    {
+      "symbol": "TNM",
+      "value": 31.25,
+      "change": 31.25,
+      "timestamp": "2026-02-10T11:33:12.354737"
+    }
+  ],
+  "market_summary": {
+    "total_stocks": 16,
+    "total_indices": 16,
+    "scrape_timestamp": "2026-02-10T11:33:12.354755",
+    "status": "success"
+  }
+}
